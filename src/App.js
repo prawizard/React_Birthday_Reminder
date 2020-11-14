@@ -4,28 +4,6 @@ import List from './List';
 import Axios from 'axios';
 import Pagination from './Pagination';
 
-const mysql = require("mysql");
-
-const store_MySQL = (id, name, dob, image) => {
-  var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "rootpw",
-    database: "BirthdayReminder__DB"
-  });
-  con.connect(function(err) {
-    if (err) throw err;
-      console.log("Connected!");
-      var x;
-      var sql;
-      sql = "INSERT INTO Friends (id, name, dob, imageURL) VALUES ('"+id+"','"+name+"','"+dob+"','"+image+"'"+")";
-      console.log(sql);
-      con.query(sql, function (err, result) {
-      if (err) throw err;
-      });      
-    });
-}
-
 const calculateAge = (dob) => {
   var today = new Date();
   var bDay = new Date(dob);
@@ -43,13 +21,24 @@ function App() {
   const [dob,setDob]=useState('');
   const [img,setImg]=useState('');
 
-  const [people, setPeople] = useState([]);
+  const [people, setPeople] = useState(data);
   const [currPage,setCurrPage]=useState(1);
   const [namesPerPage,setNamesPerPage]=useState(5);
 
   const indexOfLastName = currPage * namesPerPage;
   const indexOfFirstName = indexOfLastName - namesPerPage;
   const currNames = people.slice(indexOfFirstName,indexOfLastName);
+
+  // const addNew = () => {
+  //   console.log("inside Add New");
+  //   Axios.post('http://localhost:3000/addNew', {
+  //     friendName:personName, 
+  //     birthDay:dob, 
+  //     imgURL:img
+  //   }).then((response) => {
+  //     console.log(response);
+  //   });
+  // };
 
   const paginateFn = (pageNumber) => {
     setCurrPage(pageNumber);
@@ -58,7 +47,9 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const person={id:new Date().getTime().toString(), name:personName, age:calculateAge(dob), image:img};
-    store_MySQL(new Date().getTime().toString(), personName, dob, img);
+    console.log(person);
+    // store_MySQL(new Date().getTime().toString(), personName, dob, img);
+    // addNew();
     setPeople((people) => {
       return [...people,person];
     });
@@ -77,7 +68,7 @@ function App() {
       </section>
       <br></br>
       <section className='container'>
-        <form className="form-inline" onSubmit={handleSubmit}>
+        <form className="form-inline" >
           <div className="form-group row">
             <label htmlFor="friendName" className="col-sm-2 col-form-label">Name</label>
               <div className="col-sm-10">
@@ -99,7 +90,7 @@ function App() {
                value={img} onChange={(e) => setImg(e.target.value)}/>
               </div>
           </div>
-        <button>Add Item</button>
+        <button onClick={handleSubmit}>Add Item</button>
           {/* <button type="submit" className="btn btn-primary mb-2">Add Item</button> */}
         </form>
 
